@@ -1,18 +1,23 @@
+import * as fs from "fs";
+import * as path from "path";
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const utf8decoder = new TextDecoder();
+  const billOfTheo = utf8decoder.decode(
+    fs.readFileSync(
+      path.join(__dirname, "./example-theo.html"),
+      null
+    )
+  ) as string;
 
-  const lockedAmount = ethers.utils.parseEther("0.001");
+  const BillOfTheo = await ethers.getContractFactory("BillOfTheo");
+  const bill = await BillOfTheo.deploy(billOfTheo);
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
+  await bill.deployed();
 
   console.log(
-    `Lock with ${ethers.utils.formatEther(lockedAmount)}ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`
+    `BillOfTheo deployed to ${bill.address}`
   );
 }
 
