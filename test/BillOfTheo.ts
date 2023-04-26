@@ -21,16 +21,18 @@ describe("BillOfTheo", function () {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const BillOfTheo = await ethers.getContractFactory("BillOfTheo");
-    const bill = await BillOfTheo.deploy(billOfTheo);
+    const bill = await BillOfTheo.deploy();
 
     return { bill, billOfTheo, owner, otherAccount };
   }
 
   describe("Deployment", function () {
     it("Should set the right billOfTheo", async function () {
-      const { bill, billOfTheo } = await loadFixture(deployBillOfTheo);
+      const { bill, billOfTheo, owner } = await loadFixture(deployBillOfTheo);
 
-      expect(await bill.readBill()).to.equal(billOfTheo);
+      const tokenId = (await bill.writeBill(owner.address, billOfTheo)).value;
+
+      expect(await bill.tokenURI(tokenId)).to.equal(billOfTheo);
     });
   });
 });
